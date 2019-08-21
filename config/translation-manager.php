@@ -16,6 +16,17 @@ return [
     ],
 
     /**
+     * For paginating index
+    */
+    'per_page' => 80,
+
+
+
+    'find_translations_group' => 'site',
+
+    'find_translations_path' => resources_path('views/client'),
+
+    /**
      * Enable deletion of translations
      *
      * @type boolean

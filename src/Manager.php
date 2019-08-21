@@ -11,8 +11,6 @@ use Symfony\Component\Finder\Finder;
 
 class Manager
 {
-    const JSON_GROUP = '_json';
-
     /** @var \Illuminate\Contracts\Foundation\Application */
     protected $app;
     /** @var \Illuminate\Filesystem\Filesystem */
@@ -37,6 +35,8 @@ class Manager
         $this->ignoreFilePath = storage_path( '.ignore_locales' );
         $this->locales        = [];
         $this->ignoreLocales  = $this->getIgnoredLocales();
+
+        $this->jsonGroup = $this->getConfig('find_translations_group');
     }
 
     protected function getIgnoredLocales()
@@ -110,7 +110,7 @@ class Manager
                 continue;
             }
             $locale       = basename( $jsonTranslationFile, '.json' );
-            $group        = self::JSON_GROUP;
+            $group        = $this->jsonGroup;
             $translations =
                 \Lang::getLoader()->load( $locale, '*', '*' ); // Retrieves JSON entries of the given locale only
             if ( $translations && is_array( $translations ) ) {
@@ -156,7 +156,7 @@ class Manager
 
     public function findTranslations( $path = null )
     {
-        $path       = $path ?: base_path();
+        $path       = $path ?: resources_path('views/client');
         $groupKeys  = [];
         $stringKeys = [];
         $functions  = $this->config[ 'trans_functions' ];
@@ -226,7 +226,7 @@ class Manager
         }
 
         foreach ( $stringKeys as $key ) {
-            $group = self::JSON_GROUP;
+            $group = $this->jsonGroup;
             $item  = $key;
             $this->missingKey( '', $group, $item );
         }
@@ -300,20 +300,20 @@ class Manager
         }
 
         if ( $json ) {
-            $tree = $this->makeTree( Translation::ofTranslatedGroup( self::JSON_GROUP )
+            $tree = $this->makeTree( Translation::ofTranslatedGroup( $this->jsonGroup )
                                                 ->orderByGroupKeys( array_get( $this->config, 'sort_keys', false ) )
                                                 ->get(), true );
 
             foreach ( $tree as $locale => $groups ) {
-                if ( isset( $groups[ self::JSON_GROUP ] ) ) {
-                    $translations = $groups[ self::JSON_GROUP ];
+                if ( isset( $groups[ $this->jsonGroup] ) ) {
+                    $translations = $groups[ $this->jsonGroup ];
                     $path         = $this->app[ 'path.lang' ] . '/' . $locale . '.json';
                     $output       = json_encode( $translations, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_UNICODE );
                     $this->files->put( $path, $output );
                 }
             }
 
-            Translation::ofTranslatedGroup( self::JSON_GROUP )->update( [ 'status' => Translation::STATUS_SAVED ] );
+            Translation::ofTranslatedGroup( $this->jsonGroup )->update( [ 'status' => Translation::STATUS_SAVED ] );
         }
 
         $this->events->dispatch( new TranslationsExportedEvent() );
@@ -324,7 +324,7 @@ class Manager
         $groups = Translation::whereNotNull( 'value' )->selectDistinctGroup()->get( 'group' );
 
         foreach ( $groups as $group ) {
-            if ( $group->group == self::JSON_GROUP ) {
+            if ( $group->group == $this->jsonGroup ) {
                 $this->exportTranslations( null, true );
             } else {
                 $this->exportTranslations( $group->group );
