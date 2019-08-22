@@ -1,5 +1,5 @@
 {
-  "name": "nastasyaaaa/laravel-translation-manager",
+  "name": "barryvdh/laravel-translation-manager",
   "description": "Manage Laravel Translations",
   "keywords": [
     "laravel",
@@ -28,6 +28,7 @@
   "extra": {
     "branch-alias": {
       "dev-master": "0.5-dev"
+
     },
     "laravel": {
       "providers": [
@@ -35,5 +36,5 @@
       ]
     }
   },
-  "minimum-stability": "stable"
+  "minimum-stability": "master-nana"
 }
