@@ -32,7 +32,9 @@
     },
     "laravel": {
       "providers": [
-        "Barryvdh\\TranslationManager\\ManagerServiceProvider"
+        "Barryvdh\\TranslationManager\\ManagerServiceProvider",
+        "Barryvdh\\TranslationManager\\TranslationServiceProvider"
+
       ]
     }
   },
