@@ -4,20 +4,20 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 class ManagerServiceProvider extends ServiceProvider {
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = false;
+    /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $defer = false;
 
-	/**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
-	public function register()
-	{
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
         // Register the config publish path
         $configPath = __DIR__ . '/../config/translation-manager.php';
         $this->mergeConfigFrom($configPath, 'translation-manager');
@@ -52,20 +52,20 @@ class ManagerServiceProvider extends ServiceProvider {
             return new Console\CleanCommand($app['translation-manager']);
         });
         $this->commands('command.translation-manager.clean');
-	}
+    }
 
     /**
-	 * Bootstrap the application events.
-	 *
+     * Bootstrap the application events.
+     *
      * @param  \Illuminate\Routing\Router  $router
-	 * @return void
-	 */
-	public function boot(Router $router)
-	{
+     * @return void
+     */
+    public function boot(Router $router)
+    {
         $viewPath = __DIR__.'/../resources/views';
         $this->loadViewsFrom($viewPath, 'translation-manager');
         $this->publishes([
-            $viewPath => base_path('resources/views/admin/translation-manager'),
+            $viewPath => base_path('resources/views/vendor/translation-manager'),
         ], 'views');
 
         $migrationPath = __DIR__.'/../database/migrations';
@@ -89,24 +89,23 @@ class ManagerServiceProvider extends ServiceProvider {
             $router->post('/locales/add', 'Controller@postAddLocale');
             $router->post('/locales/remove', 'Controller@postRemoveLocale');
             $router->post('/publish/{groupKey}', 'Controller@postPublish')->where('groupKey', '.*');
-            $router->post('/translate-missing', 'Controller@postTranslateMissing');
         });
-	}
+    }
 
-	/**
-	 * Get the services provided by the provider.
-	 *
-	 * @return array
-	 */
-	public function provides()
-	{
-		return array('translation-manager',
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return array('translation-manager',
             'command.translation-manager.reset',
             'command.translation-manager.import',
             'command.translation-manager.find',
             'command.translation-manager.export',
             'command.translation-manager.clean'
         );
-	}
+    }
 
 }
